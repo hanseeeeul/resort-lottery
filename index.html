@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>리조트 추첨기 - d.camp</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+<style>
+  :root {
+    --orange2: #ff855c;
+    --orange3: #FF5E27;
+    --orange4: #ed4411;
+    --gray0: #000;
+    --gray1: #eceae8;
+    --gray2: #d5d2cf;
+    --gray3: #948f8d;
+    --gray4: #595453;
+    --gray5: #262525;
+    --bg: #F5F1ED;
+    --white: #fff;
+    --error: #f93232;
+    --green: #55B876;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    font-family: 'SUIT Variable', 'SUIT', 'Pretendard', -apple-system, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 160%;
+    letter-spacing: -0.16px;
+  }
+  body {
+    background: var(--bg);
+    color: var(--gray5);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* Header */
+  .header {
+    background: var(--white);
+    border-bottom: 1px solid var(--gray1);
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--gray5);
+    letter-spacing: -0.4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .logo .dot { color: var(--orange3); }
+  .header-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--orange3);
+    background: rgba(255,94,39,0.08);
+    padding: 4px 12px;
+    border-radius: 9999px;
+    letter-spacing: -0.12px;
+  }
+
+  /* Main */
+  .main {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .page-title {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.64px;
+    line-height: 120%;
+    color: var(--gray5);
+    margin-bottom: 6px;
+  }
+  .page-subtitle {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--gray3);
+    letter-spacing: -0.16px;
+    margin-bottom: 32px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--gray1);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+  .card h2 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray5);
+    letter-spacing: -0.36px;
+    line-height: 120%;
+    margin-bottom: 18px;
+  }
+
+  /* Inputs */
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  input, select {
+    font-family: inherit;
+  }
+  .input-row input, .input-row select {
+    flex: 1;
+    padding: 11px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--gray2);
+    background: var(--white);
+    color: var(--gray5);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    letter-spacing: -0.15px;
+  }
+  .input-row input:focus, .input-row select:focus {
+    border-color: var(--orange3);
+  }
+  .input-row input::placeholder { color: var(--gray3); }
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--gray2);
+    background: var(--white);
+    color: var(--gray5);
+    font-size: 15px;
+    line-height: 170%;
+    resize: vertical;
+    outline: none;
+    font-family: inherit;
+    letter-spacing: -0.15px;
+  }
+  textarea:focus { border-color: var(--orange3); }
+  textarea::placeholder { color: var(--gray3); }
+  .help-text {
+    font-size: 13px;
+    color: var(--gray3);
+    margin-top: 8px;
+    letter-spacing: -0.13px;
+  }
+  .divider-text {
+    text-align: center;
+    color: var(--gray3);
+    margin: 12px 0;
+    font-size: 13px;
+    letter-spacing: -0.13px;
+  }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  button {
+    padding: 11px 24px;
+    border-radius: 9999px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    letter-spacing: -0.15px;
+    line-height: 120%;
+  }
+  button:active { transform: scale(0.97); }
+  .btn-primary {
+    background: var(--orange3);
+    color: var(--white);
+  }
+  .btn-primary:hover { background: var(--orange4); }
+  .btn-primary:disabled {
+    background: var(--gray2);
+    color: var(--gray3);
+    cursor: not-allowed;
+  }
+  .btn-outline {
+    background: var(--white);
+    color: var(--gray4);
+    border: 1px solid var(--gray2);
+  }
+  .btn-outline:hover { border-color: var(--gray4); color: var(--gray5); }
+  .btn-danger-outline {
+    background: var(--white);
+    color: var(--error);
+    border: 1px solid rgba(249,50,50,0.25);
+  }
+  .btn-danger-outline:hover { background: rgba(249,50,50,0.04); border-color: var(--error); }
+  .btn-dark {
+    background: var(--gray5);
+    color: var(--white);
+  }
+  .btn-dark:hover { background: var(--gray0); }
+
+  /* Draw section */
+  .draw-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .draw-section label {
+    font-size: 15px;
+    color: var(--gray4);
+    font-weight: 500;
+    letter-spacing: -0.15px;
+  }
+  .draw-section input[type="number"] {
+    width: 72px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--gray2);
+    background: var(--white);
+    color: var(--gray5);
+    font-size: 15px;
+    text-align: center;
+    outline: none;
+    font-family: inherit;
+  }
+  .draw-section input[type="number"]:focus { border-color: var(--orange3); }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    background: var(--bg);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--gray4);
+    letter-spacing: -0.14px;
+  }
+  .stat-item span {
+    color: var(--orange3);
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  /* Applicant list */
+  .applicant-list {
+    max-height: 220px;
+    overflow-y: auto;
+    margin-top: 10px;
+  }
+  .applicant-list::-webkit-scrollbar { width: 4px; }
+  .applicant-list::-webkit-scrollbar-thumb { background: var(--gray2); border-radius: 2px; }
+  .applicant-item {
+    display: flex;
+    align-items: center;
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: background 0.12s;
+    letter-spacing: -0.14px;
+  }
+  .applicant-item:hover { background: var(--bg); }
+  .applicant-item .num {
+    color: var(--gray3);
+    margin-right: 12px;
+    min-width: 24px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .applicant-item .name { flex: 1; color: var(--gray5); font-weight: 500; }
+  .applicant-item .dept {
+    color: var(--gray3);
+    font-size: 13px;
+    margin-right: 8px;
+  }
+  .applicant-item .remove-btn {
+    background: none;
+    border: none;
+    color: var(--gray2);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+  }
+  .applicant-item .remove-btn:hover { color: var(--error); background: rgba(249,50,50,0.06); }
+  .empty-state {
+    color: var(--gray3);
+    text-align: center;
+    padding: 28px;
+    font-size: 14px;
+    letter-spacing: -0.14px;
+  }
+
+  /* Result */
+  .result-area {
+    text-align: center;
+    padding: 24px 0 4px;
+  }
+  .result-area.hidden { display: none; }
+  .winner-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--orange3);
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .winners {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .winner-card {
+    background: var(--bg);
+    border: 1px solid var(--gray1);
+    padding: 16px 28px;
+    border-radius: 12px;
+    animation: popIn 0.35s ease-out both;
+  }
+  .winner-card .winner-rank {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--orange3);
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .winner-card .winner-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--gray5);
+    letter-spacing: -0.36px;
+  }
+  .winner-card .winner-dept {
+    font-size: 13px;
+    color: var(--gray3);
+    margin-top: 2px;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.7) translateY(8px); opacity: 0; }
+    100% { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  /* Animation overlay */
+  .animation-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(38,37,37,0.88);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  .animation-overlay.active { display: flex; }
+  .slot-display {
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--white);
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: -0.96px;
+  }
+  .slot-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--orange2);
+    margin-bottom: 24px;
+    letter-spacing: 2px;
+  }
+
+  /* History */
+  .history-item {
+    position: relative;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: var(--bg);
+    margin-bottom: 8px;
+  }
+  .history-item .time {
+    font-size: 13px;
+    color: var(--gray3);
+    letter-spacing: -0.13px;
+  }
+  .history-item .detail {
+    margin-top: 4px;
+    font-size: 14px;
+    letter-spacing: -0.14px;
+    color: var(--gray4);
+  }
+  .history-item .detail .hw {
+    color: var(--orange3);
+    font-weight: 600;
+  }
+  .no-history {
+    color: var(--gray3);
+    text-align: center;
+    padding: 24px;
+    font-size: 14px;
+  }
+  .history-item .remove-hist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--gray2);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    line-height: 1;
+  }
+  .history-item .remove-hist-btn:hover { color: var(--error); }
+  .history-item .manual-badge {
+    display: inline-block;
+    background: rgba(85,184,118,0.12);
+    color: var(--green);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: -0.11px;
+  }
+
+  /* Manual form */
+  .manual-form {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--gray1);
+  }
+  .manual-form .toggle-btn {
+    background: var(--white);
+    color: var(--gray4);
+    border: 1px solid var(--gray2);
+    font-size: 14px;
+    padding: 9px 20px;
+  }
+  .manual-form .toggle-btn:hover { border-color: var(--gray4); color: var(--gray5); }
+  .manual-form-fields { display: none; margin-top: 14px; }
+  .manual-form-fields.show { display: block; }
+  .manual-form-fields .input-row input,
+  .manual-form-fields .input-row select {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--gray2);
+    background: var(--white);
+    color: var(--gray5);
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+  }
+  .manual-form-fields .input-row input:focus,
+  .manual-form-fields .input-row select:focus { border-color: var(--orange3); }
+
+  /* Screen Recording */
+  .rec-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 2000;
+    background: var(--error);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    transform: translateY(-100%);
+    transition: transform 0.3s;
+  }
+  .rec-bar.active { transform: translateY(0); }
+  .rec-bar .rec-dot {
+    width: 10px; height: 10px;
+    background: var(--white);
+    border-radius: 50%;
+    animation: recBlink 1s infinite;
+  }
+  @keyframes recBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .rec-bar .rec-timer {
+    font-variant-numeric: tabular-nums;
+    min-width: 50px;
+  }
+  .rec-bar button {
+    padding: 6px 16px;
+    font-size: 13px;
+    border-radius: 9999px;
+    background: rgba(255,255,255,0.2);
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.4);
+    font-weight: 600;
+  }
+  .rec-bar button:hover { background: rgba(255,255,255,0.35); }
+
+  .btn-record {
+    background: var(--white);
+    color: var(--error);
+    border: 1px solid rgba(249,50,50,0.25);
+  }
+  .btn-record:hover { background: rgba(249,50,50,0.04); border-color: var(--error); }
+  .btn-record.recording {
+    background: var(--gray5);
+    color: var(--white);
+    border-color: var(--gray5);
+  }
+  .btn-record.recording:hover { background: var(--gray0); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 12px;
+    color: var(--gray3);
+    letter-spacing: -0.12px;
+  }
+
+  @media (max-width: 600px) {
+    .page-title { font-size: 24px; }
+    .card { padding: 20px; }
+    .draw-section { flex-direction: column; align-items: stretch; }
+    .draw-section input[type="number"] { width: 100%; }
+    .slot-display { font-size: 32px; }
+    .header-inner { height: 56px; }
+    .main { padding: 24px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">dcamp <span style="font-weight:400; font-size:15px; color:var(--gray3); margin-left:4px;">리조트 추첨</span></div>
+    <div class="header-badge">Lottery</div>
+  </div>
+</div>
+
+<div class="main">
+  <h1 class="page-title">리조트 추첨기</h1>
+  <p class="page-subtitle">공정한 랜덤 추첨으로 당첨자를 선정합니다</p>
+
+  <!-- Input Section -->
+  <div class="card">
+    <h2>신청자 등록</h2>
+    <div class="input-row">
+      <input type="text" id="nameInput" placeholder="이름" />
+      <input type="text" id="deptInput" placeholder="부서 (선택)" />
+      <button class="btn-primary" onclick="addOne()" style="flex-shrink:0">추가</button>
+    </div>
+    <div class="divider-text">또는 여러 명 한번에 입력</div>
+    <textarea id="bulkInput" placeholder="한 줄에 한 명씩 입력&#10;예시:&#10;홍길동&#10;김철수, 영업팀&#10;이영희, 마케팅팀"></textarea>
+    <p class="help-text">쉼표(,)로 이름과 부서를 구분할 수 있습니다. 부서는 생략 가능.</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="addBulk()">일괄 등록</button>
+      <button class="btn-danger-outline" onclick="clearAll()">전체 삭제</button>
+    </div>
+  </div>
+
+  <!-- Applicant List -->
+  <div class="card">
+    <h2>신청자 목록</h2>
+    <div class="stats">
+      <div class="stat-item">총 신청자 <span id="totalCount">0</span>명</div>
+    </div>
+    <div class="applicant-list" id="applicantList">
+      <div class="empty-state">신청자를 등록해주세요</div>
+    </div>
+  </div>
+
+  <!-- Draw Section -->
+  <div class="card">
+    <h2>추첨</h2>
+    <div class="draw-section">
+      <label>당첨 인원</label>
+      <input type="number" id="winnerCount" value="1" min="1" />
+      <label>명</label>
+      <button class="btn-primary" id="drawBtn" onclick="startDraw()" disabled>추첨 시작</button>
+      <button class="btn-record" id="recBtn" onclick="toggleRecording()">화면 녹화</button>
+    </div>
+    <div class="result-area hidden" id="resultArea">
+      <p class="winner-label" id="resultLabel"></p>
+      <div class="winners" id="winnersContainer"></div>
+      <div class="btn-row" style="justify-content:center; margin-top: 20px;">
+        <button class="btn-outline" onclick="copyResult()">결과 복사</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="card">
+    <h2>추첨 이력</h2>
+    <div id="historyList">
+      <div class="no-history">아직 추첨 이력이 없습니다</div>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn-outline" onclick="clearHistory()">이력 초기화</button>
+    </div>
+
+    <!-- 수기 등록 -->
+    <div class="manual-form">
+      <button class="toggle-btn" onclick="toggleManualForm()">수기 이력 등록</button>
+      <div class="manual-form-fields" id="manualFormFields">
+        <div class="input-row">
+          <input type="date" id="manualDate" />
+          <input type="time" id="manualTime" value="12:00" />
+        </div>
+        <div class="input-row" style="margin-top:8px">
+          <input type="number" id="manualTotal" placeholder="총 신청자 수" min="1" />
+          <select id="manualType">
+            <option value="추첨">추첨</option>
+            <option value="수기배정">수기배정</option>
+          </select>
+        </div>
+        <div style="margin-top:8px">
+          <textarea id="manualWinners" placeholder="당첨자 입력 (한 줄에 한 명)&#10;예: 홍길동(영업팀)&#10;김철수(마케팅팀)" style="min-height:80px"></textarea>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="addManualHistory()" style="font-size:14px">이력 등록</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">d.camp Resort Lottery System</div>
+
+<!-- Recording Bar -->
+<div class="rec-bar" id="recBar">
+  <div class="rec-dot"></div>
+  <span>녹화 중</span>
+  <span class="rec-timer" id="recTimer">00:00</span>
+  <button onclick="toggleRecording()">녹화 중지 & 저장</button>
+</div>
+
+<!-- Animation Overlay -->
+<div class="animation-overlay" id="animOverlay">
+  <div class="slot-label" id="slotLabel">추첨 중...</div>
+  <div class="slot-display" id="slotDisplay"></div>
+</div>
+
+<script>
+let applicants = [];
+let history = [];
+
+const nameInput = document.getElementById('nameInput');
+const deptInput = document.getElementById('deptInput');
+const bulkInput = document.getElementById('bulkInput');
+
+nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addOne(); });
+deptInput.addEventListener('keydown', e => { if (e.key === 'Enter') addOne(); });
+
+function parseLine(line) {
+  const trimmed = line.trim();
+  if (!trimmed) return null;
+  const parts = trimmed.split(/[,\t]/).map(s => s.trim());
+  return { name: parts[0], dept: parts[1] || '' };
+}
+
+function addOne() {
+  const name = nameInput.value.trim();
+  if (!name) { nameInput.focus(); return; }
+  const dept = deptInput.value.trim();
+  applicants.push({ name, dept });
+  nameInput.value = '';
+  deptInput.value = '';
+  nameInput.focus();
+  render();
+}
+
+function addBulk() {
+  const lines = bulkInput.value.split('\n');
+  let added = 0;
+  for (const line of lines) {
+    const parsed = parseLine(line);
+    if (parsed) { applicants.push(parsed); added++; }
+  }
+  if (added > 0) {
+    bulkInput.value = '';
+    render();
+  }
+}
+
+function removeApplicant(idx) {
+  applicants.splice(idx, 1);
+  render();
+}
+
+function clearAll() {
+  if (applicants.length === 0) return;
+  if (!confirm('전체 신청자를 삭제하시겠습니까?')) return;
+  applicants = [];
+  render();
+}
+
+function render() {
+  const list = document.getElementById('applicantList');
+  const count = document.getElementById('totalCount');
+  const drawBtn = document.getElementById('drawBtn');
+
+  count.textContent = applicants.length;
+  drawBtn.disabled = applicants.length === 0;
+
+  if (applicants.length === 0) {
+    list.innerHTML = '<div class="empty-state">신청자를 등록해주세요</div>';
+    return;
+  }
+
+  list.innerHTML = applicants.map((a, i) => `
+    <div class="applicant-item">
+      <span class="num">${i + 1}</span>
+      <span class="name">${esc(a.name)}</span>
+      ${a.dept ? `<span class="dept">${esc(a.dept)}</span>` : ''}
+      <button class="remove-btn" onclick="removeApplicant(${i})" title="삭제">&times;</button>
+    </div>
+  `).join('');
+}
+
+function esc(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+// Cryptographically secure shuffle (Fisher-Yates with crypto.getRandomValues)
+function secureShuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const rnd = crypto.getRandomValues(new Uint32Array(1))[0];
+    const j = rnd % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+async function startDraw() {
+  const n = parseInt(document.getElementById('winnerCount').value) || 1;
+  if (applicants.length === 0) return alert('신청자가 없습니다.');
+  if (n > applicants.length) return alert(`당첨 인원(${n}명)이 신청자 수(${applicants.length}명)보다 많습니다.`);
+  if (n < 1) return alert('1명 이상 선택해주세요.');
+
+  const shuffled = secureShuffle(applicants);
+  const winners = shuffled.slice(0, n);
+
+  // Animation
+  await runAnimation(winners);
+
+  // Show result
+  showResult(winners);
+
+  // Save history
+  const now = new Date();
+  const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  history.unshift({
+    time: timeStr,
+    total: applicants.length,
+    count: n,
+    winners: winners.map(w => w.name + (w.dept ? `(${w.dept})` : ''))
+  });
+  renderHistory();
+}
+
+function runAnimation(winners) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('animOverlay');
+    const display = document.getElementById('slotDisplay');
+    const label = document.getElementById('slotLabel');
+    overlay.classList.add('active');
+
+    let currentWinner = 0;
+
+    function animateOne() {
+      if (currentWinner >= winners.length) {
+        overlay.classList.remove('active');
+        resolve();
+        return;
+      }
+
+      label.textContent = winners.length > 1
+        ? `${currentWinner + 1}번째 당첨자 추첨 중...`
+        : '추첨 중...';
+
+      let ticks = 0;
+      const totalTicks = 20;
+      const interval = setInterval(() => {
+        const rIdx = Math.floor(Math.random() * applicants.length);
+        const a = applicants[rIdx];
+        display.textContent = a.name + (a.dept ? ` (${a.dept})` : '');
+        ticks++;
+
+        if (ticks >= totalTicks) {
+          clearInterval(interval);
+          const w = winners[currentWinner];
+          display.textContent = w.name + (w.dept ? ` (${w.dept})` : '');
+          display.style.color = '#FF5E27';
+          label.textContent = winners.length > 1
+            ? `${currentWinner + 1}번째 당첨!`
+            : '당첨!';
+
+          setTimeout(() => {
+            display.style.color = '#fff';
+            currentWinner++;
+            animateOne();
+          }, 1200);
+        }
+      }, 60 + ticks * 8);
+    }
+
+    animateOne();
+  });
+}
+
+function showResult(winners) {
+  const area = document.getElementById('resultArea');
+  const container = document.getElementById('winnersContainer');
+  const label = document.getElementById('resultLabel');
+
+  area.classList.remove('hidden');
+  label.textContent = `당첨자 ${winners.length}명`;
+
+  container.innerHTML = winners.map((w, i) => `
+    <div class="winner-card" style="animation-delay: ${i * 0.1}s">
+      ${winners.length > 1 ? `<div class="winner-rank">${i + 1}번</div>` : ''}
+      <div class="winner-name">${esc(w.name)}</div>
+      ${w.dept ? `<div class="winner-dept">${esc(w.dept)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function copyResult() {
+  const cards = document.querySelectorAll('.winner-card');
+  if (cards.length === 0) return;
+  const lines = ['[d.camp 리조트 추첨 결과]', `추첨일시: ${new Date().toLocaleString('ko-KR')}`, `총 신청자: ${applicants.length}명`, '---'];
+  cards.forEach((card, i) => {
+    const name = card.querySelector('.winner-name').textContent;
+    const dept = card.querySelector('.winner-dept');
+    lines.push(`${i + 1}. ${name}${dept ? ' (' + dept.textContent + ')' : ''}`);
+  });
+  navigator.clipboard.writeText(lines.join('\n')).then(() => alert('결과가 클립보드에 복사되었습니다.'));
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (history.length === 0) {
+    list.innerHTML = '<div class="no-history">아직 추첨 이력이 없습니다</div>';
+    return;
+  }
+  list.innerHTML = history.map((h, i) => `
+    <div class="history-item">
+      <button class="remove-hist-btn" onclick="removeHistory(${i})" title="삭제">&times;</button>
+      <div class="time">${h.time} | 신청자 ${h.total}명 중 ${h.count}명 ${h.type || '추첨'}${h.manual ? '<span class="manual-badge">수기</span>' : ''}</div>
+      <div class="detail">당첨: ${h.winners.map(w => `<span class="hw">${esc(w)}</span>`).join(', ')}</div>
+    </div>
+  `).join('');
+}
+
+function removeHistory(idx) {
+  history.splice(idx, 1);
+  renderHistory();
+}
+
+function clearHistory() {
+  if (history.length === 0) return;
+  if (!confirm('전체 추첨 이력을 삭제하시겠습니까?')) return;
+  history = [];
+  renderHistory();
+}
+
+function toggleManualForm() {
+  const fields = document.getElementById('manualFormFields');
+  const isHidden = !fields.classList.contains('show');
+  fields.classList.toggle('show');
+  if (isHidden) {
+    const today = new Date();
+    document.getElementById('manualDate').value = today.toISOString().split('T')[0];
+    const hh = String(today.getHours()).padStart(2, '0');
+    const mm = String(today.getMinutes()).padStart(2, '0');
+    document.getElementById('manualTime').value = `${hh}:${mm}`;
+  }
+}
+
+function addManualHistory() {
+  const date = document.getElementById('manualDate').value;
+  const time = document.getElementById('manualTime').value;
+  const total = parseInt(document.getElementById('manualTotal').value);
+  const type = document.getElementById('manualType').value;
+  const winnersText = document.getElementById('manualWinners').value.trim();
+
+  if (!date) return alert('날짜를 입력해주세요.');
+  if (!winnersText) return alert('당첨자를 입력해주세요.');
+
+  const winners = winnersText.split('\n').map(s => s.trim()).filter(Boolean);
+  if (winners.length === 0) return alert('당첨자를 입력해주세요.');
+
+  const timeStr = `${date} ${time || '00:00'}`;
+
+  history.unshift({
+    time: timeStr,
+    total: total || winners.length,
+    count: winners.length,
+    type: type,
+    winners: winners,
+    manual: true
+  });
+
+  // 입력 초기화
+  document.getElementById('manualTotal').value = '';
+  document.getElementById('manualWinners').value = '';
+  document.getElementById('manualFormFields').classList.remove('show');
+
+  renderHistory();
+}
+
+// === Screen Recording ===
+let mediaRecorder = null;
+let recordedChunks = [];
+let recStream = null;
+let recStartTime = null;
+let recTimerInterval = null;
+
+async function toggleRecording() {
+  if (mediaRecorder && mediaRecorder.state === 'recording') {
+    mediaRecorder.stop();
+    return;
+  }
+
+  try {
+    recStream = await navigator.mediaDevices.getDisplayMedia({
+      video: { displaySurface: 'browser' },
+      audio: false
+    });
+  } catch (e) {
+    return;
+  }
+
+  recordedChunks = [];
+  mediaRecorder = new MediaRecorder(recStream, { mimeType: 'video/webm' });
+
+  mediaRecorder.ondataavailable = e => {
+    if (e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = () => {
+    recStream.getTracks().forEach(t => t.stop());
+    clearInterval(recTimerInterval);
+    document.getElementById('recBar').classList.remove('active');
+    document.querySelector('.header').style.top = '0';
+
+    const btn = document.getElementById('recBtn');
+    btn.textContent = '화면 녹화';
+    btn.classList.remove('recording');
+
+    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const now = new Date();
+    const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
+    a.href = url;
+    a.download = `리조트추첨_${ts}.webm`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  recStream.getVideoTracks()[0].onended = () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
+  };
+
+  mediaRecorder.start();
+
+  document.getElementById('recBar').classList.add('active');
+  document.querySelector('.header').style.top = '42px';
+  const btn = document.getElementById('recBtn');
+  btn.textContent = '녹화 중지';
+  btn.classList.add('recording');
+
+  recStartTime = Date.now();
+  const timerEl = document.getElementById('recTimer');
+  recTimerInterval = setInterval(() => {
+    const elapsed = Math.floor((Date.now() - recStartTime) / 1000);
+    const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
+    const ss = String(elapsed % 60).padStart(2, '0');
+    timerEl.textContent = `${mm}:${ss}`;
+  }, 1000);
+}
+
+render();
+</script>
+</body>
+</html>
