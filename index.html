@@ -6,7 +6,6 @@
 <title>리조트 추첨기 - dcamp</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
 <style>
   :root {
     --orange2: #ff855c;
@@ -1459,45 +1458,37 @@ function buildPdfHtml(h) {
   `;
 }
 
-function generatePDF(h, filename) {
-  const container = document.createElement('div');
-  container.style.position = 'fixed';
-  container.style.left = '0';
-  container.style.top = '0';
-  container.style.zIndex = '-9999';
-  container.style.background = '#fff';
-  container.innerHTML = buildPdfHtml(h);
-  document.body.appendChild(container);
-
-  // 렌더링 대기 후 PDF 생성
-  setTimeout(() => {
-    html2pdf().set({
-      margin: [10, 10, 10, 10],
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 700 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    }).from(container).save().then(() => {
-      document.body.removeChild(container);
-    }).catch(() => {
-      document.body.removeChild(container);
-      alert('PDF 생성에 실패했습니다.');
-    });
-  }, 300);
+function generatePDF(h) {
+  const html = buildPdfHtml(h);
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>리조트 추첨 결과</title>
+<link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+<style>
+  @media print {
+    body { margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>${html}</body>
+</html>`);
+  win.document.close();
+  // 폰트 로딩 대기 후 인쇄 다이얼로그
+  setTimeout(() => { win.print(); }, 500);
 }
 
 function downloadCurrentResultPDF() {
   if (!lastDrawResult) return alert('추첨 결과가 없습니다.');
-  const h = lastDrawResult;
-  const dateStr = h.time.replace(/[:\s]/g, '_');
-  generatePDF(h, `리조트추첨_${h.resort}_${dateStr}.pdf`);
+  generatePDF(lastDrawResult);
 }
 
 function downloadHistoryPDF(idx) {
   const h = data.history[idx];
   if (!h) return;
-  const dateStr = h.time.replace(/[:\s]/g, '_');
-  generatePDF(h, `리조트추첨_${h.resort || '기본'}_${dateStr}.pdf`);
+  generatePDF(h);
 }
 
 // ==================== SCREEN RECORDING ====================
