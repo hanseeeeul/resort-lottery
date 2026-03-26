@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>리조트 추첨기 - d.camp</title>
+<title>리조트 추첨기 - dcamp</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT/fonts/variable/woff2/SUIT-Variable.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.2/html2pdf.bundle.min.js"></script>
 <style>
   :root {
     --orange2: #ff855c;
@@ -21,6 +22,7 @@
     --white: #fff;
     --error: #f93232;
     --green: #55B876;
+    --blue: #3B82F6;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -112,6 +114,38 @@
     line-height: 120%;
     margin-bottom: 18px;
   }
+
+  /* Resort selector */
+  .resort-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .resort-tab {
+    padding: 8px 18px;
+    border-radius: 9999px;
+    border: 1px solid var(--gray2);
+    background: var(--white);
+    color: var(--gray4);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    letter-spacing: -0.14px;
+  }
+  .resort-tab:hover { border-color: var(--gray4); color: var(--gray5); }
+  .resort-tab.active {
+    background: var(--orange3);
+    color: var(--white);
+    border-color: var(--orange3);
+  }
+  .resort-tab.add-tab {
+    border-style: dashed;
+    color: var(--gray3);
+  }
+  .resort-tab.add-tab:hover { border-color: var(--orange3); color: var(--orange3); }
 
   /* Inputs */
   .input-row {
@@ -216,6 +250,10 @@
     color: var(--white);
   }
   .btn-dark:hover { background: var(--gray0); }
+  .btn-sm {
+    padding: 7px 16px;
+    font-size: 13px;
+  }
 
   /* Draw section */
   .draw-section {
@@ -264,10 +302,13 @@
     font-weight: 700;
     font-size: 16px;
   }
+  .stat-item span.blue {
+    color: var(--blue);
+  }
 
   /* Applicant list */
   .applicant-list {
-    max-height: 220px;
+    max-height: 300px;
     overflow-y: auto;
     margin-top: 10px;
   }
@@ -295,6 +336,30 @@
     color: var(--gray3);
     font-size: 13px;
     margin-right: 8px;
+  }
+  .applicant-item .prev-badge {
+    display: inline-block;
+    background: rgba(59,130,246,0.1);
+    color: var(--blue);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 9999px;
+    margin-right: 8px;
+    cursor: pointer;
+    letter-spacing: -0.11px;
+  }
+  .applicant-item .prev-badge:hover {
+    background: rgba(59,130,246,0.2);
+  }
+  .applicant-item .prev-badge.inactive {
+    background: transparent;
+    border: 1px dashed var(--gray2);
+    color: var(--gray3);
+  }
+  .applicant-item .prev-badge.inactive:hover {
+    border-color: var(--blue);
+    color: var(--blue);
   }
   .applicant-item .remove-btn {
     background: none;
@@ -360,6 +425,11 @@
     color: var(--gray3);
     margin-top: 2px;
   }
+  .winner-card .winner-prev {
+    font-size: 11px;
+    color: var(--blue);
+    margin-top: 4px;
+  }
   @keyframes popIn {
     0% { transform: scale(0.7) translateY(8px); opacity: 0; }
     100% { transform: scale(1) translateY(0); opacity: 1; }
@@ -407,6 +477,17 @@
     font-size: 13px;
     color: var(--gray3);
     letter-spacing: -0.13px;
+  }
+  .history-item .resort-name-badge {
+    display: inline-block;
+    background: rgba(255,94,39,0.08);
+    color: var(--orange3);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    margin-right: 6px;
+    letter-spacing: -0.12px;
   }
   .history-item .detail {
     margin-top: 4px;
@@ -538,6 +619,43 @@
   }
   .btn-record.recording:hover { background: var(--gray0); }
 
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(38,37,37,0.5);
+    z-index: 500;
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 28px;
+    width: 90%;
+    max-width: 400px;
+    animation: popIn 0.25s ease-out;
+  }
+  .modal h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    letter-spacing: -0.36px;
+  }
+  .modal input {
+    width: 100%;
+    padding: 11px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--gray2);
+    font-size: 15px;
+    outline: none;
+    font-family: inherit;
+    margin-bottom: 16px;
+  }
+  .modal input:focus { border-color: var(--orange3); }
+
   /* Footer */
   .footer {
     text-align: center;
@@ -545,6 +663,56 @@
     font-size: 12px;
     color: var(--gray3);
     letter-spacing: -0.12px;
+  }
+
+  /* Resort manage buttons */
+  .resort-manage {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  /* PDF Download Banner */
+  .pdf-banner {
+    background: var(--white);
+    border: 2px solid var(--orange3);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-top: 20px;
+    animation: popIn 0.35s ease-out;
+  }
+  .pdf-banner.hidden { display: none; }
+  .pdf-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .pdf-banner-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: rgba(255,94,39,0.08);
+    color: var(--orange3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .pdf-banner-text { flex: 1; }
+  .pdf-banner-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray5);
+    letter-spacing: -0.32px;
+  }
+  .pdf-banner-desc {
+    font-size: 13px;
+    color: var(--gray3);
+    margin-top: 2px;
+    letter-spacing: -0.13px;
   }
 
   @media (max-width: 600px) {
@@ -555,6 +723,8 @@
     .slot-display { font-size: 32px; }
     .header-inner { height: 56px; }
     .main { padding: 24px 16px 60px; }
+    .pdf-banner-inner { flex-direction: column; text-align: center; }
+    .pdf-banner-inner button { width: 100%; }
   }
 </style>
 </head>
@@ -570,19 +740,33 @@
 
 <div class="main">
   <h1 class="page-title">리조트 추첨기</h1>
-  <p class="page-subtitle">공정한 랜덤 추첨으로 당첨자를 선정합니다</p>
+  <p class="page-subtitle">공정한 랜덤 추첨으로 당첨자를 선정합니다 (기사용자 후순위)</p>
+
+  <!-- Resort Tabs -->
+  <div class="card">
+    <h2>리조트 선택</h2>
+    <div class="resort-selector" id="resortTabs"></div>
+    <div class="resort-manage">
+      <button class="btn-outline btn-sm" onclick="openAddResortModal()">+ 리조트 추가</button>
+      <button class="btn-outline btn-sm" onclick="renameCurrentResort()">이름 변경</button>
+      <button class="btn-danger-outline btn-sm" onclick="deleteCurrentResort()">삭제</button>
+    </div>
+  </div>
 
   <!-- Input Section -->
   <div class="card">
     <h2>신청자 등록</h2>
     <div class="input-row">
       <input type="text" id="nameInput" placeholder="이름" />
-      <input type="text" id="deptInput" placeholder="부서 (선택)" />
+      <input type="text" id="deptInput" placeholder="기업명 (선택)" />
+      <label style="display:flex;align-items:center;gap:4px;font-size:14px;color:var(--gray4);white-space:nowrap;cursor:pointer;">
+        <input type="checkbox" id="prevCheck" style="width:16px;height:16px;accent-color:var(--blue);cursor:pointer;" /> 기사용자
+      </label>
       <button class="btn-primary" onclick="addOne()" style="flex-shrink:0">추가</button>
     </div>
     <div class="divider-text">또는 여러 명 한번에 입력</div>
-    <textarea id="bulkInput" placeholder="한 줄에 한 명씩 입력&#10;예시:&#10;홍길동&#10;김철수, 영업팀&#10;이영희, 마케팅팀"></textarea>
-    <p class="help-text">쉼표(,)로 이름과 부서를 구분할 수 있습니다. 부서는 생략 가능.</p>
+    <textarea id="bulkInput" placeholder="한 줄에 한 명씩 입력&#10;예시:&#10;홍길동&#10;김철수, 영업팀&#10;이영희, 마케팅팀, 기사용&#10;&#10;세 번째 값에 '기사용' 입력 시 후순위 처리"></textarea>
+    <p class="help-text">쉼표(,)로 이름, 기업명, 기사용 여부를 구분합니다. 기업명와 기사용은 생략 가능.</p>
     <div class="btn-row">
       <button class="btn-primary" onclick="addBulk()">일괄 등록</button>
       <button class="btn-danger-outline" onclick="clearAll()">전체 삭제</button>
@@ -594,6 +778,8 @@
     <h2>신청자 목록</h2>
     <div class="stats">
       <div class="stat-item">총 신청자 <span id="totalCount">0</span>명</div>
+      <div class="stat-item">신규 <span id="newCount">0</span>명</div>
+      <div class="stat-item">기사용자 <span id="prevCount" class="blue">0</span>명</div>
     </div>
     <div class="applicant-list" id="applicantList">
       <div class="empty-state">신청자를 등록해주세요</div>
@@ -603,6 +789,7 @@
   <!-- Draw Section -->
   <div class="card">
     <h2>추첨</h2>
+    <p style="font-size:13px;color:var(--gray3);margin-bottom:14px;">신규 신청자가 우선 추첨되고, 기사용자는 남은 자리에 후순위로 추첨됩니다.</p>
     <div class="draw-section">
       <label>당첨 인원</label>
       <input type="number" id="winnerCount" value="1" min="1" />
@@ -615,6 +802,7 @@
       <div class="winners" id="winnersContainer"></div>
       <div class="btn-row" style="justify-content:center; margin-top: 20px;">
         <button class="btn-outline" onclick="copyResult()">결과 복사</button>
+        <button class="btn-outline" onclick="downloadCurrentResultPDF()">PDF 저장</button>
       </div>
     </div>
   </div>
@@ -634,6 +822,7 @@
       <button class="toggle-btn" onclick="toggleManualForm()">수기 이력 등록</button>
       <div class="manual-form-fields" id="manualFormFields">
         <div class="input-row">
+          <input type="text" id="manualResort" placeholder="리조트명" />
           <input type="date" id="manualDate" />
           <input type="time" id="manualTime" value="12:00" />
         </div>
@@ -653,9 +842,21 @@
       </div>
     </div>
   </div>
+
+  <!-- PDF Download Banner -->
+  <div class="pdf-banner hidden" id="pdfBanner">
+    <div class="pdf-banner-inner">
+      <div class="pdf-banner-icon">PDF</div>
+      <div class="pdf-banner-text">
+        <div class="pdf-banner-title">추첨 결과 리포트 다운로드</div>
+        <div class="pdf-banner-desc" id="pdfBannerDesc">추첨 결과를 PDF 문서로 저장할 수 있습니다.</div>
+      </div>
+      <button class="btn-primary" onclick="downloadCurrentResultPDF()" style="flex-shrink:0;">PDF 다운로드</button>
+    </div>
+  </div>
 </div>
 
-<div class="footer">d.camp Resort Lottery System</div>
+<div class="footer">dcamp Resort Lottery System</div>
 
 <!-- Recording Bar -->
 <div class="rec-bar" id="recBar">
@@ -671,12 +872,141 @@
   <div class="slot-display" id="slotDisplay"></div>
 </div>
 
-<script>
-let applicants = [];
-let history = [];
+<!-- Add Resort Modal -->
+<div class="modal-overlay" id="resortModal">
+  <div class="modal">
+    <h3 id="resortModalTitle">리조트 추가</h3>
+    <input type="text" id="resortNameInput" placeholder="리조트 이름 (예: 소노호텔, 한화리조트)" />
+    <div class="btn-row" style="justify-content:flex-end">
+      <button class="btn-outline" onclick="closeResortModal()">취소</button>
+      <button class="btn-primary" onclick="confirmResortModal()">확인</button>
+    </div>
+  </div>
+</div>
 
+<script>
+// ==================== DATA ====================
+const STORAGE_KEY = 'dcamp_resort_lottery';
+
+let data = {
+  resorts: ['기본'],
+  currentResort: '기본',
+  applicantsByResort: { '기본': [] },
+  history: []
+};
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      data = { ...data, ...parsed };
+      // Ensure applicantsByResort exists for all resorts
+      for (const r of data.resorts) {
+        if (!data.applicantsByResort[r]) data.applicantsByResort[r] = [];
+      }
+    }
+  } catch (e) {}
+}
+
+function saveData() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function getApplicants() {
+  return data.applicantsByResort[data.currentResort] || [];
+}
+
+function setApplicants(list) {
+  data.applicantsByResort[data.currentResort] = list;
+  saveData();
+}
+
+// ==================== RESORT TABS ====================
+function renderResortTabs() {
+  const container = document.getElementById('resortTabs');
+  container.innerHTML = data.resorts.map(r => `
+    <button class="resort-tab ${r === data.currentResort ? 'active' : ''}" onclick="switchResort('${esc(r)}')">${esc(r)}</button>
+  `).join('');
+}
+
+function switchResort(name) {
+  data.currentResort = name;
+  saveData();
+  renderResortTabs();
+  render();
+}
+
+let resortModalMode = 'add'; // 'add' or 'rename'
+
+function openAddResortModal() {
+  resortModalMode = 'add';
+  document.getElementById('resortModalTitle').textContent = '리조트 추가';
+  document.getElementById('resortNameInput').value = '';
+  document.getElementById('resortModal').classList.add('active');
+  document.getElementById('resortNameInput').focus();
+}
+
+function renameCurrentResort() {
+  resortModalMode = 'rename';
+  document.getElementById('resortModalTitle').textContent = '리조트 이름 변경';
+  document.getElementById('resortNameInput').value = data.currentResort;
+  document.getElementById('resortModal').classList.add('active');
+  document.getElementById('resortNameInput').focus();
+}
+
+function closeResortModal() {
+  document.getElementById('resortModal').classList.remove('active');
+}
+
+function confirmResortModal() {
+  const name = document.getElementById('resortNameInput').value.trim();
+  if (!name) return alert('이름을 입력해주세요.');
+
+  if (resortModalMode === 'add') {
+    if (data.resorts.includes(name)) return alert('이미 존재하는 리조트입니다.');
+    data.resorts.push(name);
+    data.applicantsByResort[name] = [];
+    data.currentResort = name;
+  } else {
+    if (name !== data.currentResort && data.resorts.includes(name)) return alert('이미 존재하는 리조트입니다.');
+    const old = data.currentResort;
+    const idx = data.resorts.indexOf(old);
+    data.resorts[idx] = name;
+    data.applicantsByResort[name] = data.applicantsByResort[old];
+    if (old !== name) delete data.applicantsByResort[old];
+    data.currentResort = name;
+  }
+
+  saveData();
+  closeResortModal();
+  renderResortTabs();
+  render();
+}
+
+function deleteCurrentResort() {
+  if (data.resorts.length <= 1) return alert('최소 1개의 리조트가 필요합니다.');
+  if (!confirm(`"${data.currentResort}" 리조트를 삭제하시겠습니까?\n등록된 신청자도 함께 삭제됩니다.`)) return;
+
+  const old = data.currentResort;
+  data.resorts = data.resorts.filter(r => r !== old);
+  delete data.applicantsByResort[old];
+  data.currentResort = data.resorts[0];
+  saveData();
+  renderResortTabs();
+  render();
+}
+
+// Enter key for modal
+document.getElementById('resortNameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmResortModal();
+  if (e.key === 'Escape') closeResortModal();
+});
+
+// ==================== APPLICANTS ====================
 const nameInput = document.getElementById('nameInput');
 const deptInput = document.getElementById('deptInput');
+const prevCheck = document.getElementById('prevCheck');
 const bulkInput = document.getElementById('bulkInput');
 
 nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addOne(); });
@@ -686,64 +1016,95 @@ function parseLine(line) {
   const trimmed = line.trim();
   if (!trimmed) return null;
   const parts = trimmed.split(/[,\t]/).map(s => s.trim());
-  return { name: parts[0], dept: parts[1] || '' };
+  const isPrev = parts.some(p => /기사용/.test(p));
+  const filtered = parts.filter(p => !/기사용/.test(p));
+  return { name: filtered[0] || '', dept: filtered[1] || '', prev: isPrev };
 }
 
 function addOne() {
   const name = nameInput.value.trim();
   if (!name) { nameInput.focus(); return; }
   const dept = deptInput.value.trim();
-  applicants.push({ name, dept });
+  const prev = prevCheck.checked;
+  const list = getApplicants();
+  list.push({ name, dept, prev });
+  setApplicants(list);
   nameInput.value = '';
   deptInput.value = '';
+  prevCheck.checked = false;
   nameInput.focus();
   render();
 }
 
 function addBulk() {
   const lines = bulkInput.value.split('\n');
+  const list = getApplicants();
   let added = 0;
   for (const line of lines) {
     const parsed = parseLine(line);
-    if (parsed) { applicants.push(parsed); added++; }
+    if (parsed && parsed.name) { list.push(parsed); added++; }
   }
   if (added > 0) {
+    setApplicants(list);
     bulkInput.value = '';
     render();
   }
 }
 
 function removeApplicant(idx) {
-  applicants.splice(idx, 1);
+  const list = getApplicants();
+  list.splice(idx, 1);
+  setApplicants(list);
+  render();
+}
+
+function togglePrev(idx) {
+  const list = getApplicants();
+  list[idx].prev = !list[idx].prev;
+  setApplicants(list);
   render();
 }
 
 function clearAll() {
-  if (applicants.length === 0) return;
+  const list = getApplicants();
+  if (list.length === 0) return;
   if (!confirm('전체 신청자를 삭제하시겠습니까?')) return;
-  applicants = [];
+  setApplicants([]);
   render();
 }
 
 function render() {
-  const list = document.getElementById('applicantList');
-  const count = document.getElementById('totalCount');
+  const list = getApplicants();
+  const listEl = document.getElementById('applicantList');
+  const countEl = document.getElementById('totalCount');
+  const newCountEl = document.getElementById('newCount');
+  const prevCountEl = document.getElementById('prevCount');
   const drawBtn = document.getElementById('drawBtn');
 
-  count.textContent = applicants.length;
-  drawBtn.disabled = applicants.length === 0;
+  const prevCount = list.filter(a => a.prev).length;
+  const newCount = list.length - prevCount;
 
-  if (applicants.length === 0) {
-    list.innerHTML = '<div class="empty-state">신청자를 등록해주세요</div>';
+  countEl.textContent = list.length;
+  newCountEl.textContent = newCount;
+  prevCountEl.textContent = prevCount;
+  drawBtn.disabled = list.length === 0;
+
+  if (list.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">신청자를 등록해주세요</div>';
     return;
   }
 
-  list.innerHTML = applicants.map((a, i) => `
+  // Sort: 신규 먼저, 기사용자 뒤로
+  const sorted = list.map((a, i) => ({ ...a, origIdx: i }));
+  sorted.sort((a, b) => (a.prev === b.prev ? 0 : a.prev ? 1 : -1));
+
+  listEl.innerHTML = sorted.map((a, i) => `
     <div class="applicant-item">
       <span class="num">${i + 1}</span>
       <span class="name">${esc(a.name)}</span>
       ${a.dept ? `<span class="dept">${esc(a.dept)}</span>` : ''}
-      <button class="remove-btn" onclick="removeApplicant(${i})" title="삭제">&times;</button>
+      <span class="prev-badge ${a.prev ? '' : 'inactive'}" onclick="togglePrev(${a.origIdx})" title="클릭하여 기사용 여부 변경">${a.prev ? '기사용' : '신규'}</span>
+      <button class="remove-btn" onclick="removeApplicant(${a.origIdx})" title="삭제">&times;</button>
     </div>
   `).join('');
 }
@@ -754,6 +1115,7 @@ function esc(str) {
   return d.innerHTML;
 }
 
+// ==================== DRAW ====================
 // Cryptographically secure shuffle (Fisher-Yates with crypto.getRandomValues)
 function secureShuffle(arr) {
   const a = [...arr];
@@ -766,16 +1128,32 @@ function secureShuffle(arr) {
 }
 
 async function startDraw() {
+  const applicants = getApplicants();
   const n = parseInt(document.getElementById('winnerCount').value) || 1;
   if (applicants.length === 0) return alert('신청자가 없습니다.');
   if (n > applicants.length) return alert(`당첨 인원(${n}명)이 신청자 수(${applicants.length}명)보다 많습니다.`);
   if (n < 1) return alert('1명 이상 선택해주세요.');
 
-  const shuffled = secureShuffle(applicants);
-  const winners = shuffled.slice(0, n);
+  // Priority draw: 신규 먼저, 기사용자 후순위
+  const newApplicants = applicants.filter(a => !a.prev);
+  const prevApplicants = applicants.filter(a => a.prev);
+
+  const shuffledNew = secureShuffle(newApplicants);
+  const shuffledPrev = secureShuffle(prevApplicants);
+
+  // 신규에서 최대한 뽑고, 부족하면 기사용자에서
+  const winners = [];
+  for (const a of shuffledNew) {
+    if (winners.length >= n) break;
+    winners.push(a);
+  }
+  for (const a of shuffledPrev) {
+    if (winners.length >= n) break;
+    winners.push(a);
+  }
 
   // Animation
-  await runAnimation(winners);
+  await runAnimation(winners, applicants);
 
   // Show result
   showResult(winners);
@@ -783,16 +1161,33 @@ async function startDraw() {
   // Save history
   const now = new Date();
   const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
-  history.unshift({
+  const historyEntry = {
     time: timeStr,
+    resort: data.currentResort,
     total: applicants.length,
     count: n,
-    winners: winners.map(w => w.name + (w.dept ? `(${w.dept})` : ''))
-  });
+    newCount: newApplicants.length,
+    prevCount: prevApplicants.length,
+    winners: winners.map(w => ({
+      name: w.name,
+      dept: w.dept || '',
+      prev: w.prev || false
+    }))
+  };
+  lastDrawResult = historyEntry;
+  data.history.unshift(historyEntry);
+  saveData();
   renderHistory();
+
+  // PDF 다운로드 배너 표시
+  const pdfBanner = document.getElementById('pdfBanner');
+  const pdfDesc = document.getElementById('pdfBannerDesc');
+  pdfBanner.classList.remove('hidden');
+  pdfDesc.textContent = `${data.currentResort} | ${timeStr} | 신청자 ${applicants.length}명 중 ${n}명 추첨 완료`;
+  pdfBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
-function runAnimation(winners) {
+function runAnimation(winners, applicants) {
   return new Promise(resolve => {
     const overlay = document.getElementById('animOverlay');
     const display = document.getElementById('slotDisplay');
@@ -855,6 +1250,7 @@ function showResult(winners) {
       ${winners.length > 1 ? `<div class="winner-rank">${i + 1}번</div>` : ''}
       <div class="winner-name">${esc(w.name)}</div>
       ${w.dept ? `<div class="winner-dept">${esc(w.dept)}</div>` : ''}
+      ${w.prev ? `<div class="winner-prev">기사용자</div>` : ''}
     </div>
   `).join('');
 }
@@ -862,39 +1258,58 @@ function showResult(winners) {
 function copyResult() {
   const cards = document.querySelectorAll('.winner-card');
   if (cards.length === 0) return;
-  const lines = ['[d.camp 리조트 추첨 결과]', `추첨일시: ${new Date().toLocaleString('ko-KR')}`, `총 신청자: ${applicants.length}명`, '---'];
+  const applicants = getApplicants();
+  const lines = [
+    `[dcamp 리조트 추첨 결과]`,
+    `리조트: ${data.currentResort}`,
+    `추첨일시: ${new Date().toLocaleString('ko-KR')}`,
+    `총 신청자: ${applicants.length}명`,
+    '---'
+  ];
   cards.forEach((card, i) => {
     const name = card.querySelector('.winner-name').textContent;
     const dept = card.querySelector('.winner-dept');
-    lines.push(`${i + 1}. ${name}${dept ? ' (' + dept.textContent + ')' : ''}`);
+    const prev = card.querySelector('.winner-prev');
+    lines.push(`${i + 1}. ${name}${dept ? ' (' + dept.textContent + ')' : ''}${prev ? ' [기사용]' : ''}`);
   });
   navigator.clipboard.writeText(lines.join('\n')).then(() => alert('결과가 클립보드에 복사되었습니다.'));
 }
 
+// ==================== HISTORY ====================
 function renderHistory() {
   const list = document.getElementById('historyList');
-  if (history.length === 0) {
+  if (data.history.length === 0) {
     list.innerHTML = '<div class="no-history">아직 추첨 이력이 없습니다</div>';
     return;
   }
-  list.innerHTML = history.map((h, i) => `
+  list.innerHTML = data.history.map((h, i) => `
     <div class="history-item">
       <button class="remove-hist-btn" onclick="removeHistory(${i})" title="삭제">&times;</button>
-      <div class="time">${h.time} | 신청자 ${h.total}명 중 ${h.count}명 ${h.type || '추첨'}${h.manual ? '<span class="manual-badge">수기</span>' : ''}</div>
-      <div class="detail">당첨: ${h.winners.map(w => `<span class="hw">${esc(w)}</span>`).join(', ')}</div>
+      <div class="time">
+        <span class="resort-name-badge">${esc(h.resort || '기본')}</span>
+        ${h.time} | 신청자 ${h.total}명 중 ${h.count}명 ${h.type || '추첨'}${h.manual ? '<span class="manual-badge">수기</span>' : ''}
+        <button class="btn-outline btn-sm" onclick="downloadHistoryPDF(${i})" style="margin-left:6px;padding:3px 10px;font-size:11px;border-radius:6px;">PDF</button>
+      </div>
+      <div class="detail">당첨: ${h.winners.map(w => {
+        const name = typeof w === 'string' ? w : w.name + (w.dept ? `(${w.dept})` : '');
+        const isPrev = typeof w === 'object' && w.prev;
+        return `<span class="hw">${esc(name)}</span>${isPrev ? ' <span style="color:var(--blue);font-size:11px;">[기사용]</span>' : ''}`;
+      }).join(', ')}</div>
     </div>
   `).join('');
 }
 
 function removeHistory(idx) {
-  history.splice(idx, 1);
+  data.history.splice(idx, 1);
+  saveData();
   renderHistory();
 }
 
 function clearHistory() {
-  if (history.length === 0) return;
+  if (data.history.length === 0) return;
   if (!confirm('전체 추첨 이력을 삭제하시겠습니까?')) return;
-  history = [];
+  data.history = [];
+  saveData();
   renderHistory();
 }
 
@@ -903,6 +1318,7 @@ function toggleManualForm() {
   const isHidden = !fields.classList.contains('show');
   fields.classList.toggle('show');
   if (isHidden) {
+    document.getElementById('manualResort').value = data.currentResort;
     const today = new Date();
     document.getElementById('manualDate').value = today.toISOString().split('T')[0];
     const hh = String(today.getHours()).padStart(2, '0');
@@ -912,6 +1328,7 @@ function toggleManualForm() {
 }
 
 function addManualHistory() {
+  const resort = document.getElementById('manualResort').value.trim() || data.currentResort;
   const date = document.getElementById('manualDate').value;
   const time = document.getElementById('manualTime').value;
   const total = parseInt(document.getElementById('manualTotal').value);
@@ -921,13 +1338,15 @@ function addManualHistory() {
   if (!date) return alert('날짜를 입력해주세요.');
   if (!winnersText) return alert('당첨자를 입력해주세요.');
 
-  const winners = winnersText.split('\n').map(s => s.trim()).filter(Boolean);
-  if (winners.length === 0) return alert('당첨자를 입력해주세요.');
+  const winnerLines = winnersText.split('\n').map(s => s.trim()).filter(Boolean);
+  if (winnerLines.length === 0) return alert('당첨자를 입력해주세요.');
 
+  const winners = winnerLines.map(w => ({ name: w, dept: '', prev: false }));
   const timeStr = `${date} ${time || '00:00'}`;
 
-  history.unshift({
+  data.history.unshift({
     time: timeStr,
+    resort: resort,
     total: total || winners.length,
     count: winners.length,
     type: type,
@@ -935,15 +1354,138 @@ function addManualHistory() {
     manual: true
   });
 
-  // 입력 초기화
   document.getElementById('manualTotal').value = '';
   document.getElementById('manualWinners').value = '';
   document.getElementById('manualFormFields').classList.remove('show');
 
+  saveData();
   renderHistory();
 }
 
-// === Screen Recording ===
+// ==================== PDF REPORT ====================
+let lastDrawResult = null; // 마지막 추첨 결과 저장
+
+function buildPdfHtml(h) {
+  const winnersHtml = h.winners.map((w, i) => {
+    const name = typeof w === 'string' ? w : w.name;
+    const dept = typeof w === 'object' && w.dept ? w.dept : '';
+    const isPrev = typeof w === 'object' && w.prev;
+    return `
+      <tr>
+        <td style="padding:10px 14px;border-bottom:1px solid #eceae8;text-align:center;color:#948f8d;font-size:14px;">${i + 1}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #eceae8;font-weight:600;font-size:15px;color:#262525;">${esc(name)}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #eceae8;color:#948f8d;font-size:14px;">${esc(dept)}</td>
+        <td style="padding:10px 14px;border-bottom:1px solid #eceae8;text-align:center;font-size:12px;">
+          ${isPrev ? '<span style="background:rgba(59,130,246,0.1);color:#3B82F6;padding:2px 10px;border-radius:9999px;font-weight:600;">기사용</span>' : '<span style="color:#55B876;font-weight:600;">신규</span>'}
+        </td>
+      </tr>`;
+  }).join('');
+
+  const applicantsInfo = h.newCount !== undefined
+    ? `<span style="color:#55B876;font-weight:600;">신규 ${h.newCount}명</span> / <span style="color:#3B82F6;font-weight:600;">기사용 ${h.prevCount}명</span>`
+    : '';
+
+  return `
+    <div style="font-family:'SUIT Variable','SUIT','Pretendard',-apple-system,sans-serif;padding:40px;max-width:700px;margin:0 auto;">
+      <!-- Header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #FF5E27;">
+        <div>
+          <div style="font-size:22px;font-weight:800;color:#262525;letter-spacing:-0.44px;">dcamp</div>
+          <div style="font-size:12px;color:#948f8d;margin-top:2px;">Resort Lottery Report</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#948f8d;">추첨 리포트</div>
+          <div style="font-size:13px;color:#262525;font-weight:600;">${esc(h.time)}</div>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div style="text-align:center;margin-bottom:32px;">
+        <div style="display:inline-block;background:rgba(255,94,39,0.08);color:#FF5E27;font-size:14px;font-weight:700;padding:6px 20px;border-radius:9999px;letter-spacing:-0.14px;margin-bottom:12px;">${esc(h.resort || '기본')}</div>
+        <h1 style="font-size:26px;font-weight:700;color:#262525;letter-spacing:-0.52px;margin:8px 0 0;">리조트 추첨 결과</h1>
+      </div>
+
+      <!-- Summary -->
+      <div style="display:flex;gap:12px;margin-bottom:28px;justify-content:center;flex-wrap:wrap;">
+        <div style="background:#F5F1ED;padding:12px 24px;border-radius:10px;text-align:center;">
+          <div style="font-size:12px;color:#948f8d;">총 신청자</div>
+          <div style="font-size:22px;font-weight:700;color:#262525;">${h.total}명</div>
+          ${applicantsInfo ? `<div style="font-size:11px;margin-top:2px;">${applicantsInfo}</div>` : ''}
+        </div>
+        <div style="background:#F5F1ED;padding:12px 24px;border-radius:10px;text-align:center;">
+          <div style="font-size:12px;color:#948f8d;">당첨 인원</div>
+          <div style="font-size:22px;font-weight:700;color:#FF5E27;">${h.count}명</div>
+        </div>
+        <div style="background:#F5F1ED;padding:12px 24px;border-radius:10px;text-align:center;">
+          <div style="font-size:12px;color:#948f8d;">추첨 방식</div>
+          <div style="font-size:22px;font-weight:700;color:#262525;">${h.type || '추첨'}${h.manual ? ' (수기)' : ''}</div>
+        </div>
+      </div>
+
+      <!-- Winners Table -->
+      <div style="margin-bottom:28px;">
+        <div style="font-size:13px;font-weight:700;color:#FF5E27;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">당첨자 명단</div>
+        <table style="width:100%;border-collapse:collapse;border:1px solid #eceae8;border-radius:8px;overflow:hidden;">
+          <thead>
+            <tr style="background:#F5F1ED;">
+              <th style="padding:10px 14px;text-align:center;font-size:13px;font-weight:600;color:#595453;width:50px;">순번</th>
+              <th style="padding:10px 14px;text-align:left;font-size:13px;font-weight:600;color:#595453;">이름</th>
+              <th style="padding:10px 14px;text-align:left;font-size:13px;font-weight:600;color:#595453;">기업명</th>
+              <th style="padding:10px 14px;text-align:center;font-size:13px;font-weight:600;color:#595453;width:80px;">구분</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${winnersHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Footer -->
+      <div style="border-top:1px solid #eceae8;padding-top:16px;margin-top:16px;">
+        <p style="font-size:12px;color:#948f8d;text-align:center;margin:0;">
+          본 문서는 dcamp 리조트 추첨기에서 자동 생성된 공식 추첨 결과 리포트입니다.
+        </p>
+        <p style="font-size:11px;color:#d5d2cf;text-align:center;margin:6px 0 0;">
+          추첨 알고리즘: Fisher-Yates Shuffle (crypto.getRandomValues) | 신규 우선, 기사용자 후순위
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+function generatePDF(h, filename) {
+  const container = document.createElement('div');
+  container.innerHTML = buildPdfHtml(h);
+  document.body.appendChild(container);
+
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(container).save().then(() => {
+    document.body.removeChild(container);
+  });
+}
+
+function downloadCurrentResultPDF() {
+  if (!lastDrawResult) return alert('추첨 결과가 없습니다.');
+  const h = lastDrawResult;
+  const dateStr = h.time.replace(/[:\s]/g, '_');
+  generatePDF(h, `리조트추첨_${h.resort}_${dateStr}.pdf`);
+}
+
+function downloadHistoryPDF(idx) {
+  const h = data.history[idx];
+  if (!h) return;
+  const dateStr = h.time.replace(/[:\s]/g, '_');
+  generatePDF(h, `리조트추첨_${h.resort || '기본'}_${dateStr}.pdf`);
+}
+
+// ==================== SCREEN RECORDING ====================
 let mediaRecorder = null;
 let recordedChunks = [];
 let recStream = null;
@@ -988,7 +1530,7 @@ async function toggleRecording() {
     const now = new Date();
     const ts = `${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}${String(now.getMinutes()).padStart(2,'0')}${String(now.getSeconds()).padStart(2,'0')}`;
     a.href = url;
-    a.download = `리조트추첨_${ts}.webm`;
+    a.download = `리조트추첨_${data.currentResort}_${ts}.webm`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -1017,7 +1559,11 @@ async function toggleRecording() {
   }, 1000);
 }
 
+// ==================== INIT ====================
+loadData();
+renderResortTabs();
 render();
+renderHistory();
 </script>
 </body>
 </html>
