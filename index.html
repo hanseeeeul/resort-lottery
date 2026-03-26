@@ -1386,46 +1386,52 @@ function buildPdfHtml(h) {
     : '';
 
   return `
-    <div style="font-family:'SUIT Variable','SUIT','Pretendard',-apple-system,sans-serif;padding:40px;max-width:700px;margin:0 auto;">
+    <div style="font-family:'SUIT Variable','SUIT','Pretendard',-apple-system,sans-serif;padding:40px;width:660px;background:#fff;">
       <!-- Header -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;padding-bottom:20px;border-bottom:2px solid #FF5E27;">
-        <div>
-          <div style="font-size:22px;font-weight:800;color:#262525;letter-spacing:-0.44px;">dcamp</div>
-          <div style="font-size:12px;color:#948f8d;margin-top:2px;">Resort Lottery Report</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:#948f8d;">추첨 리포트</div>
-          <div style="font-size:13px;color:#262525;font-weight:600;">${esc(h.time)}</div>
-        </div>
-      </div>
+      <table style="width:100%;margin-bottom:32px;border-bottom:2px solid #FF5E27;padding-bottom:20px;">
+        <tr>
+          <td style="vertical-align:top;">
+            <div style="font-size:22px;font-weight:800;color:#262525;">dcamp</div>
+            <div style="font-size:12px;color:#948f8d;margin-top:2px;">Resort Lottery Report</div>
+          </td>
+          <td style="text-align:right;vertical-align:top;">
+            <div style="font-size:11px;color:#948f8d;">추첨 리포트</div>
+            <div style="font-size:13px;color:#262525;font-weight:600;">${esc(h.time)}</div>
+          </td>
+        </tr>
+      </table>
 
       <!-- Title -->
       <div style="text-align:center;margin-bottom:32px;">
-        <div style="display:inline-block;background:rgba(255,94,39,0.08);color:#FF5E27;font-size:14px;font-weight:700;padding:6px 20px;border-radius:9999px;letter-spacing:-0.14px;margin-bottom:12px;">${esc(h.resort || '기본')}</div>
-        <h1 style="font-size:26px;font-weight:700;color:#262525;letter-spacing:-0.52px;margin:8px 0 0;">리조트 추첨 결과</h1>
+        <span style="background:rgba(255,94,39,0.08);color:#FF5E27;font-size:14px;font-weight:700;padding:6px 20px;border-radius:9999px;">${esc(h.resort || '기본')}</span>
+        <h1 style="font-size:26px;font-weight:700;color:#262525;margin:12px 0 0;">리조트 추첨 결과</h1>
       </div>
 
       <!-- Summary -->
-      <div style="display:flex;gap:12px;margin-bottom:28px;justify-content:center;flex-wrap:wrap;">
-        <div style="background:#F5F1ED;padding:12px 24px;border-radius:10px;text-align:center;">
-          <div style="font-size:12px;color:#948f8d;">총 신청자</div>
-          <div style="font-size:22px;font-weight:700;color:#262525;">${h.total}명</div>
-          ${applicantsInfo ? `<div style="font-size:11px;margin-top:2px;">${applicantsInfo}</div>` : ''}
-        </div>
-        <div style="background:#F5F1ED;padding:12px 24px;border-radius:10px;text-align:center;">
-          <div style="font-size:12px;color:#948f8d;">당첨 인원</div>
-          <div style="font-size:22px;font-weight:700;color:#FF5E27;">${h.count}명</div>
-        </div>
-        <div style="background:#F5F1ED;padding:12px 24px;border-radius:10px;text-align:center;">
-          <div style="font-size:12px;color:#948f8d;">추첨 방식</div>
-          <div style="font-size:22px;font-weight:700;color:#262525;">${h.type || '추첨'}${h.manual ? ' (수기)' : ''}</div>
-        </div>
-      </div>
+      <table style="width:100%;margin-bottom:28px;">
+        <tr>
+          <td style="text-align:center;background:#F5F1ED;padding:12px 24px;border-radius:10px;">
+            <div style="font-size:12px;color:#948f8d;">총 신청자</div>
+            <div style="font-size:22px;font-weight:700;color:#262525;">${h.total}명</div>
+            ${applicantsInfo ? `<div style="font-size:11px;margin-top:2px;">${applicantsInfo}</div>` : ''}
+          </td>
+          <td style="width:12px;"></td>
+          <td style="text-align:center;background:#F5F1ED;padding:12px 24px;border-radius:10px;">
+            <div style="font-size:12px;color:#948f8d;">당첨 인원</div>
+            <div style="font-size:22px;font-weight:700;color:#FF5E27;">${h.count}명</div>
+          </td>
+          <td style="width:12px;"></td>
+          <td style="text-align:center;background:#F5F1ED;padding:12px 24px;border-radius:10px;">
+            <div style="font-size:12px;color:#948f8d;">추첨 방식</div>
+            <div style="font-size:22px;font-weight:700;color:#262525;">${h.type || '추첨'}${h.manual ? ' (수기)' : ''}</div>
+          </td>
+        </tr>
+      </table>
 
       <!-- Winners Table -->
       <div style="margin-bottom:28px;">
         <div style="font-size:13px;font-weight:700;color:#FF5E27;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">당첨자 명단</div>
-        <table style="width:100%;border-collapse:collapse;border:1px solid #eceae8;border-radius:8px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;border:1px solid #eceae8;">
           <thead>
             <tr style="background:#F5F1ED;">
               <th style="padding:10px 14px;text-align:center;font-size:13px;font-weight:600;color:#595453;width:50px;">순번</th>
@@ -1455,20 +1461,29 @@ function buildPdfHtml(h) {
 
 function generatePDF(h, filename) {
   const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.zIndex = '-9999';
+  container.style.background = '#fff';
   container.innerHTML = buildPdfHtml(h);
   document.body.appendChild(container);
 
-  const opt = {
-    margin: [10, 10, 10, 10],
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
-  html2pdf().set(opt).from(container).save().then(() => {
-    document.body.removeChild(container);
-  });
+  // 렌더링 대기 후 PDF 생성
+  setTimeout(() => {
+    html2pdf().set({
+      margin: [10, 10, 10, 10],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, logging: false, windowWidth: 700 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }).from(container).save().then(() => {
+      document.body.removeChild(container);
+    }).catch(() => {
+      document.body.removeChild(container);
+      alert('PDF 생성에 실패했습니다.');
+    });
+  }, 300);
 }
 
 function downloadCurrentResultPDF() {
