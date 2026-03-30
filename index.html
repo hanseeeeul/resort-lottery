@@ -1202,9 +1202,7 @@ function runAnimation(winners, applicants) {
         return;
       }
 
-      label.textContent = winners.length > 1
-        ? `${currentWinner + 1}번째 당첨자 추첨 중...`
-        : '추첨 중...';
+      label.textContent = `${currentWinner + 1}순번 당첨자 추첨 중...`;
 
       let ticks = 0;
       const totalTicks = 20;
@@ -1219,9 +1217,7 @@ function runAnimation(winners, applicants) {
           const w = winners[currentWinner];
           display.textContent = w.name + (w.dept ? ` (${w.dept})` : '');
           display.style.color = '#FF5E27';
-          label.textContent = winners.length > 1
-            ? `${currentWinner + 1}번째 당첨!`
-            : '당첨!';
+          label.textContent = `${currentWinner + 1}순번 당첨!`;
 
           setTimeout(() => {
             display.style.color = '#fff';
@@ -1246,7 +1242,7 @@ function showResult(winners) {
 
   container.innerHTML = winners.map((w, i) => `
     <div class="winner-card" style="animation-delay: ${i * 0.1}s">
-      ${winners.length > 1 ? `<div class="winner-rank">${i + 1}번</div>` : ''}
+      <div class="winner-rank">${i + 1}순번</div>
       <div class="winner-name">${esc(w.name)}</div>
       ${w.dept ? `<div class="winner-dept">${esc(w.dept)}</div>` : ''}
       ${w.prev ? `<div class="winner-prev">기사용자</div>` : ''}
@@ -1269,7 +1265,7 @@ function copyResult() {
     const name = card.querySelector('.winner-name').textContent;
     const dept = card.querySelector('.winner-dept');
     const prev = card.querySelector('.winner-prev');
-    lines.push(`${i + 1}. ${name}${dept ? ' (' + dept.textContent + ')' : ''}${prev ? ' [기사용]' : ''}`);
+    lines.push(`${i + 1}순번 ${name}${dept ? ' (' + dept.textContent + ')' : ''}${prev ? ' [기사용]' : ''}`);
   });
   navigator.clipboard.writeText(lines.join('\n')).then(() => alert('결과가 클립보드에 복사되었습니다.'));
 }
@@ -1289,10 +1285,10 @@ function renderHistory() {
         ${h.time} | 신청자 ${h.total}명 중 ${h.count}명 ${h.type || '추첨'}${h.manual ? '<span class="manual-badge">수기</span>' : ''}
         <button class="btn-outline btn-sm" onclick="downloadHistoryPDF(${i})" style="margin-left:6px;padding:3px 10px;font-size:11px;border-radius:6px;">PDF</button>
       </div>
-      <div class="detail">당첨: ${h.winners.map(w => {
+      <div class="detail">당첨: ${h.winners.map((w, wi) => {
         const name = typeof w === 'string' ? w : w.name + (w.dept ? `(${w.dept})` : '');
         const isPrev = typeof w === 'object' && w.prev;
-        return `<span class="hw">${esc(name)}</span>${isPrev ? ' <span style="color:var(--blue);font-size:11px;">[기사용]</span>' : ''}`;
+        return `<span class="hw">${wi + 1}순번 ${esc(name)}</span>${isPrev ? ' <span style="color:var(--blue);font-size:11px;">[기사용]</span>' : ''}`;
       }).join(', ')}</div>
     </div>
   `).join('');
