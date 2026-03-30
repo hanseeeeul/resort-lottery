@@ -429,6 +429,30 @@
     color: var(--blue);
     margin-top: 4px;
   }
+  .winner-card.not-winner {
+    opacity: 0.5;
+    border-color: #e0e0e0;
+  }
+  .winner-badge-tag {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--primary);
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+    display: inline-block;
+  }
+  .loser-badge-tag {
+    font-size: 11px;
+    font-weight: 600;
+    color: #aaa;
+    background: #f0f0f0;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin-top: 6px;
+    display: inline-block;
+  }
   @keyframes popIn {
     0% { transform: scale(0.7) translateY(8px); opacity: 0; }
     100% { transform: scale(1) translateY(0); opacity: 1; }
@@ -1140,22 +1164,15 @@ async function startDraw() {
   const shuffledNew = secureShuffle(newApplicants);
   const shuffledPrev = secureShuffle(prevApplicants);
 
-  // 신규에서 최대한 뽑고, 부족하면 기사용자에서
-  const winners = [];
-  for (const a of shuffledNew) {
-    if (winners.length >= n) break;
-    winners.push(a);
-  }
-  for (const a of shuffledPrev) {
-    if (winners.length >= n) break;
-    winners.push(a);
-  }
+  // 전체 순번 매기기: 신규 먼저, 기사용자 후순위
+  const allRanked = [...shuffledNew, ...shuffledPrev];
+  const winners = allRanked.slice(0, n);
 
-  // Animation
+  // Animation (당첨자만 애니메이션)
   await runAnimation(winners, applicants);
 
-  // Show result
-  showResult(winners);
+  // Show result (전체 순번)
+  showResult(allRanked, n);
 
   // Save history
   const now = new Date();
@@ -1167,7 +1184,7 @@ async function startDraw() {
     count: n,
     newCount: newApplicants.length,
     prevCount: prevApplicants.length,
-    winners: winners.map(w => ({
+    winners: allRanked.map(w => ({
       name: w.name,
       dept: w.dept || '',
       prev: w.prev || false
@@ -1232,22 +1249,25 @@ function runAnimation(winners, applicants) {
   });
 }
 
-function showResult(winners) {
+function showResult(allRanked, winnerCount) {
   const area = document.getElementById('resultArea');
   const container = document.getElementById('winnersContainer');
   const label = document.getElementById('resultLabel');
 
   area.classList.remove('hidden');
-  label.textContent = `당첨자 ${winners.length}명`;
+  label.textContent = `전체 순번 (당첨 ${winnerCount}명 / 총 ${allRanked.length}명)`;
 
-  container.innerHTML = winners.map((w, i) => `
-    <div class="winner-card" style="animation-delay: ${i * 0.1}s">
+  container.innerHTML = allRanked.map((w, i) => {
+    const isWinner = i < winnerCount;
+    return `
+    <div class="winner-card${isWinner ? '' : ' not-winner'}" style="animation-delay: ${i * 0.1}s">
       <div class="winner-rank">${i + 1}순번</div>
       <div class="winner-name">${esc(w.name)}</div>
       ${w.dept ? `<div class="winner-dept">${esc(w.dept)}</div>` : ''}
       ${w.prev ? `<div class="winner-prev">기사용자</div>` : ''}
-    </div>
-  `).join('');
+      ${isWinner ? '<div class="winner-badge-tag">당첨</div>' : '<div class="loser-badge-tag">미당첨</div>'}
+    </div>`;
+  }).join('');
 }
 
 function copyResult() {
